@@ -98,7 +98,10 @@ class ShopScraping{
 
 			//個別ページスクレイピング
 			$pageResult=$this->kobetu($pageResult);
+
+			//目印
 			exit();
+
 			//車種の紐付け
 			$pageResult=$this->himotuke($pageResult);
 
@@ -340,13 +343,22 @@ class ShopScraping{
 
 	//個別ページ処理
 	function kobetu($pageResult){
+		$colorGetAfterResult=array();
 
 		//デバッグ出力
 		$this->arrayPut($pageResult,"kobetuMae");
 
+
+		//リンク先取得
 		foreach($pageResult as $value){
 			if(	isset($value["リンク"])	){
-				$this->linkSakiGet($value["リンク"]);
+				$allcolor=$this->linkSakiGet($value["リンク"]);
+				if($allcolor){
+					foreach($allcolor as $color){
+						$add=$value;
+						$add[]=$color;
+						$colorGetAfterRsult+=$add;
+				}
 			}
 		}
 
@@ -376,8 +388,15 @@ class ShopScraping{
 	*/
 		return $pageResult;
 	}
+
+	//リンク先ゲット
 	function linkSakiGet($link){
 		$kobetuColorPattern=$this->shop->kobetuColorPattern;
+		$kobetuColorDeletePattern=$this->shop->kobetuColorDeletePattern;
+		$scrap=$this->scraping($link);
+		if(	preg_match_all($kobetuColorPattrn,$scrap,$result)>=1	){
+			return $result[0];
+		}
 	}
 
 

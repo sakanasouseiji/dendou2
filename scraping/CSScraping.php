@@ -31,6 +31,7 @@ class CSShop{
 
 	//カラー取得用パターン
 	public	$kobetuColorPattern='/img-responsive\" \/>.*<span>.*<\/span>/ius';	
+	//public	$kobetuColorDeletePattern='/img-responsive\" \/>.*<span>.*<\/span>/ius';	
 
 	//削除用パターン
 	//商品名用
