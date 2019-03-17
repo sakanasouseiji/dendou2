@@ -44,7 +44,7 @@ function scraping($url){
 
 
 	return $html;
-}
+}	//scraping終了
 
 class ShopScraping{
 	public	$shop;
@@ -339,7 +339,7 @@ class ShopScraping{
 		}
 		//紐付けその１ここまで
 		return $pageResult;
-	}
+	}	//himotuke終了
 
 	//個別ページ処理
 	function kobetu($pageResult){
@@ -358,46 +358,23 @@ class ShopScraping{
 						$add=$value;
 						$add[]=$color;
 						$colorGetAfterRsult+=$add;
+					}
 				}
 			}
 		}
 
-	/*
-		foreach($pageResult as ){
-			
-			
-		}
-		if(	isset($this->shop->linkPattern)	){
-			$linkPattern=$this->shop->linkPattern;
-			$linkPattern=$this->shop->linkDeletePattern;
-			$kobetuColorPattern=$this->shop->kobetuColorPattern;
-		}
-		$i=0;
-			$i++;
-			//個別ページ確認・移動・再スクレイピング
-			if(	isset($linkPattern)	){
-				if(	preg_match($linkPattern,$cell,$link	){
-					$link=str_replace($linkDeletePattern,"",$link);
-					$kobetuPage=scraping($link);
-					$count=preg_match_all($kobetuColorPattern,$kobetuPage,$kobetuArray);
-					array_splice($array,$i,0,$kobetuArray);
-					foreach($kobetuArray as $colorKey =>
-				}
-				
-			}
-	*/
 		return $pageResult;
-	}
+	}	//kobetu終了
 
 	//リンク先ゲット
 	function linkSakiGet($link){
 		$kobetuColorPattern=$this->shop->kobetuColorPattern;
-		$kobetuColorDeletePattern=$this->shop->kobetuColorDeletePattern;
+		//$kobetuColorDeletePattern=$this->shop->kobetuColorDeletePattern;
 		$scrap=$this->scraping($link);
 		if(	preg_match_all($kobetuColorPattrn,$scrap,$result)>=1	){
 			return $result[0];
 		}
-	}
+	}	//linkSakiGet終了
 
 
 	//配列のファイル出力(デバッグ用)
@@ -422,7 +399,9 @@ class ShopScraping{
 		file_put_contents($fileName.date('Ymd').".csv",$csv,LOCK_EX);
 		file_put_contents($fileName.date('Ymd').".txt",print_r($array,true),LOCK_EX);
 		return;
-	}
+
+	}	//arrayPut終了
 
 }	//class終了
+
 ?>
