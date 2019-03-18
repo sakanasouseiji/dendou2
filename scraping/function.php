@@ -357,7 +357,7 @@ class ShopScraping{
 					foreach($allcolor as $color){
 						$add=$value;
 						$add[]=$color;
-						$colorGetAfterRsult+=$add;
+						$colorGetAfterResult+=$add;
 					}
 				}
 			}
@@ -370,8 +370,8 @@ class ShopScraping{
 	function linkSakiGet($link){
 		$kobetuColorPattern=$this->shop->kobetuColorPattern;
 		//$kobetuColorDeletePattern=$this->shop->kobetuColorDeletePattern;
-		$scrap=$this->scraping($link);
-		if(	preg_match_all($kobetuColorPattrn,$scrap,$result)>=1	){
+		$scrap=scraping($link);
+		if(	preg_match_all($kobetuColorPattern,$scrap,$result)>=1	){
 			return $result[0];
 		}
 	}	//linkSakiGet終了
