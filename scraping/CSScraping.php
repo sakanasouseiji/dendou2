@@ -30,8 +30,9 @@ class CSShop{
 	public	$linkReplacement=array('https://cyclespot.jp/store','');
 
 	//カラー取得用パターン
-	public	$kobetuColorPattern='/img-responsive\" \/>.*<span>.*<\/span>/ius';	
-	//public	$kobetuColorDeletePattern='/img-responsive\" \/>.*<span>.*<\/span>/ius';	
+	public	$kobetuColorLargePattern='/<b>カラーバリエーション<\/b><\/div>.*お気に入りへ追加<\/a>/ius';	
+	public	$kobetuColorSmallPattern='/<span>.*?<\/span>/ius';	
+	public	$kobetuColorDeletePattern=array("<span>","</span>");	
 
 	//削除用パターン
 	//商品名用

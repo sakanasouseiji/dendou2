@@ -99,12 +99,11 @@ class ShopScraping{
 			//個別ページスクレイピング
 			$pageResult=$this->kobetu($pageResult);
 
-			//目印
-			exit();
-
 			//車種の紐付け
 			$pageResult=$this->himotuke($pageResult);
 
+			//目印
+			exit();
 
 			//db書き込み
 			$this->dbWrite($pageResult);
@@ -148,7 +147,6 @@ class ShopScraping{
 		$zeikomiDeletePattern=$this->shop->zeikomiDeletePattern;
 		if(	isset($this->shop->linkPattern)	){
 			$linkPattern=$this->shop->linkPattern;
-			$kobetuColorPattern=$this->shop->kobetuColorPattern;
 			$linkReplacePattern=(isset($this->shop->linkReplacePattern))?$this->shop->linkReplacePattern:'';
 			$linkReplacement=(isset($this->shop->linkReplacement))?$this->shop->linkReplacement:'';
 		}
@@ -345,8 +343,9 @@ class ShopScraping{
 	function kobetu($pageResult){
 		$colorGetAfterResult=array();
 
+
 		//デバッグ出力
-		$this->arrayPut($pageResult,"kobetuMae");
+		$this->arrayPut($pageResult,"kobetuMae",0);
 
 
 		//リンク先取得
@@ -363,22 +362,37 @@ class ShopScraping{
 			}
 		}
 
+		//デバッグ出力
+		$this->arrayPut($colorGetAfterResult,"colorGetAfterResult",0);
+
 		return $pageResult;
 	}	//kobetu終了
 
 	//リンク先ゲット
 	function linkSakiGet($link){
-		$kobetuColorPattern=$this->shop->kobetuColorPattern;
-		//$kobetuColorDeletePattern=$this->shop->kobetuColorDeletePattern;
+		$color=array();
+		$kobetuColorLargePattern=$this->shop->kobetuColorLargePattern;
+		$kobetuColorSmallPattern=$this->shop->kobetuColorSmallPattern;
+		$kobetuColorDeletePattern=$this->shop->kobetuColorDeletePattern;
 		$scrap=scraping($link);
-		if(	preg_match_all($kobetuColorPattern,$scrap,$result)>=1	){
-			return $result[0];
+		if(	preg_match($kobetuColorLargePattern,$scrap,$result)>=1	){
+			$subject=$result[0];
+			if(	preg_match_all($kobetuColorSmallPattern,$subject,$result)>=1	){
+				foreach($result[0] as $cutSubject){
+					$cutAfter=str_replace($kobetuColorDeletePattern,"",$cutSubject);
+					//$cutAfter=str_replace(array("<span>","</span>"),"",$cutSubject);
+					$color[]=$cutAfter;
+				}
+				$this->arrayPut($color,"color",1);
+				return $color;
+			}
 		}
+		return false;
 	}	//linkSakiGet終了
 
 
 	//配列のファイル出力(デバッグ用)
-	function arrayPut($array,$fileName){
+	function arrayPut($array,$fileName,$fileAppend=0){
 		$midashi="";
 		$honbun="";
 		if(	!is_array($array)	){
@@ -396,8 +410,13 @@ class ShopScraping{
 			} 
 		}
 		$csv=$midashi."\n".$honbun;
-		file_put_contents($fileName.date('Ymd').".csv",$csv,LOCK_EX);
-		file_put_contents($fileName.date('Ymd').".txt",print_r($array,true),LOCK_EX);
+		if(	$fileAppend==0	){
+			file_put_contents($fileName.date('Ymd').".csv",$csv,LOCK_EX);
+			file_put_contents($fileName.date('Ymd').".txt",print_r($array,true),LOCK_EX);
+		}else{
+			file_put_contents($fileName.date('Ymd').".csv",$csv,LOCK_EX|FILE_APPEND);
+			file_put_contents($fileName.date('Ymd').".txt",print_r($array,true),LOCK_EX|FILE_APPEND);
+		}
 		return;
 
 	}	//arrayPut終了
