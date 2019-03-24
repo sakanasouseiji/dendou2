@@ -5,17 +5,30 @@
  * コピ元
  * https://mayer.jp.net/?p=2599
  * 
+ * 20190324 * 	追記:
+ *			サイクルベースあさひでサーバー側から弾かれるのでリクエストヘッダーを追加
+ * 			ヘッダー内容はchromeから丸コピ
+ * 
+ * 
  * 参考によし
  * https://qiita.com/kumasun/items/f7d17e7e74be5d441b29
  * cURLは要調べ
  *
  */
 
-
-
 function scraping($url){
+	$headers=array(
+				"HTTP/1.1",
+				"accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
+				//"accept-encoding: gzip, deflate, br",		//文字化けになる
+				"accept-language: ja,en-US;q=0.9,en;q=0.8",
+				"cache-control: max-age=0",
+				"user-agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.121 Safari/537.36"
+					);
+
 	//最終的にアクセスしたいページ
 	//クッキーがないとアクセスできない
+
 
 	//クッキー取得のためのアクセス
 	$ch=curl_init();//初期化
@@ -24,9 +37,12 @@ function scraping($url){
 	curl_setopt($ch,CURLOPT_RETURNTRANSFER,TRUE);//データをそのまま出力
 	curl_setopt($ch,CURLOPT_COOKIEJAR,'cookie.txt');//$cookieから取得した情報を保存するファイル名
 	curl_setopt($ch,CURLOPT_FOLLOWLOCATION,TRUE);//Locationヘッダの内容をたどっていく
+	//curl_setopt($ch,CURLOPT_HTTPHEADER,$headers);//リクエストヘッダー(20190324追記)
 	curl_exec($ch);
+	print "クッキー取得のためのアクセスでのエラー:".curl_error($ch);
+	print "\r\n";
 	curl_close($ch);//いったん終了
-
+	
 	//見たいページにアクセス
 
 	$ch=curl_init();
@@ -35,7 +51,10 @@ function scraping($url){
 	curl_setopt($ch,CURLOPT_COOKIEFILE, 'cookie.txt');//cookie情報を読み取る
 	curl_setopt($ch,CURLOPT_RETURNTRANSFER,TRUE);
 	curl_setopt($ch,CURLOPT_FOLLOWLOCATION,TRUE);
+	curl_setopt($ch,CURLOPT_HTTPHEADER,$headers);//リクエストヘッダー(20190324追記)
 	$html=curl_exec($ch);
+	print "直接アクセスでのエラー:".curl_error($ch);
+	print "\r\n";
 	curl_close($ch);
 
 //	
