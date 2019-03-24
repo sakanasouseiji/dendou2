@@ -343,20 +343,20 @@ class ShopScraping{
 	function kobetu($pageResult){
 		$colorGetAfterResult=array();
 
-
 		//デバッグ出力
 		$this->arrayPut($pageResult,"kobetuMae",0);
-
 
 		//リンク先取得
 		foreach($pageResult as $value){
 			if(	isset($value["リンク"])	){
-				$allcolor=$this->linkSakiGet($value["リンク"]);
-				if($allcolor){
-					foreach($allcolor as $color){
-						$add=$value;
-						$add[]=$color;
-						$colorGetAfterResult+=$add;
+				$allColor=$this->linkSakiGet($value["リンク"]);
+				if($allColor){
+					foreach($allColor as $color){
+						if(	$color!="在庫なし"	){
+							$add=$value;
+							$add=$add+array("カラー"=>$color);
+							$colorGetAfterResult[]=$add;
+						}
 					}
 				}
 			}
@@ -375,15 +375,14 @@ class ShopScraping{
 		$kobetuColorSmallPattern=$this->shop->kobetuColorSmallPattern;
 		$kobetuColorDeletePattern=$this->shop->kobetuColorDeletePattern;
 		$scrap=scraping($link);
+		$this->arrayPut($scrap,"scrap",0);
 		if(	preg_match($kobetuColorLargePattern,$scrap,$result)>=1	){
 			$subject=$result[0];
 			if(	preg_match_all($kobetuColorSmallPattern,$subject,$result)>=1	){
 				foreach($result[0] as $cutSubject){
 					$cutAfter=str_replace($kobetuColorDeletePattern,"",$cutSubject);
-					//$cutAfter=str_replace(array("<span>","</span>"),"",$cutSubject);
 					$color[]=$cutAfter;
 				}
-				$this->arrayPut($color,"color",1);
 				return $color;
 			}
 		}
@@ -396,7 +395,8 @@ class ShopScraping{
 		$midashi="";
 		$honbun="";
 		if(	!is_array($array)	){
-			file_put_contents("error".date('Ymd').".mes","fales!");
+			//file_put_contents("error".date('Ymd').".mes","fales!");
+			file_put_contents($fileName.date('Ymd').".txt",$array,LOCK_EX);
 			return false;
 		}
 		foreach($array as $key => $value){

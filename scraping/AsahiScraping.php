@@ -31,8 +31,10 @@ class AsahiShop{
 	public	$linkReplacement=array("https://ec.cb-asahi.co.jp/catalog/products/","");
 
 	//カラー取得用パターン
-	public	$kobetuColorPattern='/data-js-color-thumb-label=\".*\">/ius';	
-	
+	public	$kobetuColorLargePattern='/product_color_carousel_title.*?page_container/ius';	
+	public	$kobetuColorSmallPattern='/data-js-color-thumb-label=\".*\">/ius';	
+	public	$kobetuColorDeletePattern=array('data-js-color-thumb-label=\"','\">');	
+
 	//削除用パターン
 	//商品名用
 	public	$itemDeletePattern=array("data-sli-test=\"resultlink\">\n","</a>");
