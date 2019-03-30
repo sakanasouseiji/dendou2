@@ -118,11 +118,11 @@ class ShopScraping{
 			//個別ページスクレイピング
 			$pageResult=$this->kobetu($pageResult);
 
+			//
+			//exit();
+
 			//車種の紐付け
 			$pageResult=$this->himotuke($pageResult);
-
-			//目印
-			exit();
 
 			//db書き込み
 			$this->dbWrite($pageResult);
