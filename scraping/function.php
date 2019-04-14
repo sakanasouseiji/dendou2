@@ -39,8 +39,10 @@ function scraping($url){
 	curl_setopt($ch,CURLOPT_FOLLOWLOCATION,TRUE);//Locationヘッダの内容をたどっていく
 	//curl_setopt($ch,CURLOPT_HTTPHEADER,$headers);//リクエストヘッダー(20190324追記)
 	curl_exec($ch);
-	print "クッキー取得のためのアクセスでのエラー:".curl_error($ch);
-	print "\r\n";
+	if(curl_error($ch)){
+		print "クッキー取得のためのアクセスでのエラー:".curl_error($ch);
+		print "\r\n";
+	}
 	curl_close($ch);//いったん終了
 	
 	//見たいページにアクセス
@@ -53,8 +55,10 @@ function scraping($url){
 	curl_setopt($ch,CURLOPT_FOLLOWLOCATION,TRUE);
 	curl_setopt($ch,CURLOPT_HTTPHEADER,$headers);//リクエストヘッダー(20190324追記)
 	$html=curl_exec($ch);
-	print "直接アクセスでのエラー:".curl_error($ch);
-	print "\r\n";
+	if(curl_error($ch)){
+		print "直接アクセスでのエラー:".curl_error($ch);
+		print "\r\n";
+	}
 	curl_close($ch);
 
 //	
@@ -217,6 +221,7 @@ class ShopScraping{
 			@preg_match($zeikomiPattern,$cell,$zeikomiPrice);
 
 			$itemName[0]=mb_convert_kana(	str_replace($itemDeletePattern,"",$itemName[0])	,'KVas','UTF-8'	);
+			$itemName[0]=@str_replace(",",".",$itemName[0]);
 			$linkURL[0]=@preg_replace($linkReplacePattern,$linkReplacement,$linkURL[0]);
 			$zeinukiPrice[0]=@str_replace($zeinukiDeletePattern,"",$zeinukiPrice[0]);
 			$zeikomiPrice[0]=str_replace($zeikomiDeletePattern,"",$zeikomiPrice[0]);
@@ -339,10 +344,10 @@ class ShopScraping{
 			foreach(	$himotuke_index as $shashu	){
 				if(	preg_match($shashu["正規表現名"],$lineResult["文言"])==1	&&
 					(	(	$lineResult["年式"]==$shashu["年度"]	&&	isset($shashu["年度"])		||	
-							@strpos($lineResult["文言"],$shashu["品番"])	&&	isset($shashu["品番"])	&&	$shashu["メーカー"]!="ヤマハ"	)	||	
+							@stripos($lineResult["文言"],$shashu["品番"])	&&	isset($shashu["品番"])	&&	$shashu["メーカー"]!="ヤマハ"	)	||	
 							isset($shashu["単一商品フラグ"])	&&	$shashu["単一商品フラグ"]==1	)	&&
-					(	(	@strpos($lineResult["文言"],$shashu["タイヤサイズ"])		||	$shashu["単一タイヤサイズ"]==1	)	||
-						(	@strpos($lineResult["文言"],$shashu["フレームサイズ"])	)	)	&&
+					(	(	@stripos($lineResult["文言"],$shashu["タイヤサイズ"])		||	$shashu["単一タイヤサイズ"]==1	)	||
+						(	@stripos($lineResult["文言"],$shashu["フレームサイズ"])	)	)	&&
 						(	preg_match($shashu["正規表現色"],$lineResult["文言"])==1	)	
 				){
 					//print ($shashu["単一商品フラグ"])?"true":"false";
@@ -363,7 +368,7 @@ class ShopScraping{
 		$colorGetAfterResult=array();
 
 		//デバッグ出力
-		$this->arrayPut($pageResult,"kobetuMae",0);
+		$this->arrayPut($pageResult,"kobetuMae",1);
 
 		//リンク先取得
 		foreach($pageResult as $value){
