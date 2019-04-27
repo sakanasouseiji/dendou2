@@ -122,11 +122,11 @@ class ShopScraping{
 			//個別ページスクレイピング
 			$pageResult=$this->kobetu($pageResult);
 
-			//
-			//exit();
-
 			//車種の紐付け
 			$pageResult=$this->himotuke($pageResult);
+
+			//
+			//exit();
 
 			//db書き込み
 			$this->dbWrite($pageResult);
@@ -294,10 +294,15 @@ class ShopScraping{
 
 		foreach($pageResult as $lineResult){
 			//print_r($lineResult);
-			$sql=	"INSERT INTO t001_AllShouhinList ".
-					"(tenmei,year,mongon,zeinuki_kakaku,zeikomi_kakaku,index_No,touroku_date) ".
-					"VALUES( :tenmei , :year , :mongon , :zeinuki_kakaku , :zeikomi_kakaku , :index_No ,  DATE(now())	)";
-					//"VALUES( :tenmei , :year , :mongon , :zeinuki_kakaku , :zeikomi_kakaku , :index_No , :linkURL ,  DATE(now())	)";
+			if(	$lineResult["リンク"]!=""	){
+				$sql=	"INSERT INTO t001_AllShouhinList ".
+						"(tenmei,year,mongon,zeinuki_kakaku,zeikomi_kakaku,index_No,linkURL,touroku_date) ".
+						"VALUES( :tenmei , :year , :mongon , :zeinuki_kakaku , :zeikomi_kakaku , :index_No , :linkURL ,  DATE(now())	)";
+			}else{
+				$sql=	"INSERT INTO t001_AllShouhinList ".
+						"(tenmei,year,mongon,zeinuki_kakaku,zeikomi_kakaku,index_No,touroku_date) ".
+						"VALUES( :tenmei , :year , :mongon , :zeinuki_kakaku , :zeikomi_kakaku , :index_No ,  DATE(now())	)";
+			}
 			$stmt=$this->PDO->prepare($sql);
 			$stmt->bindvalue(':tenmei',$lineResult["店名"],PDO::PARAM_STR);
 			$stmt->bindvalue(':year',$lineResult["年式"],PDO::PARAM_STR);
@@ -305,7 +310,9 @@ class ShopScraping{
 			$stmt->bindvalue(':zeinuki_kakaku',$lineResult["税抜"],PDO::PARAM_INT);
 			$stmt->bindvalue(':zeikomi_kakaku',$lineResult["税込"],PDO::PARAM_INT);
 			$stmt->bindvalue(':index_No',$lineResult["index_No"],PDO::PARAM_INT);
-			//$stmt->bindvalue(':linkURL',$lineResult["リンク"],PDO::PARAM_INT);
+			if(	$lineResult["リンク"]!=""	){
+				$stmt->bindvalue(':linkURL',$lineResult["リンク"],PDO::PARAM_STR);
+			}
 			$res=$stmt->execute();
 			if($res){
 				//print "true ".$res."line comp\n";
@@ -314,8 +321,8 @@ class ShopScraping{
 				$err=	"false!\n".
 						"INSERT INTO t001_AllShouhinList ".
 						"(tenmei,year,mongon,zeinuki_kakaku,zeikomi_kakaku,index_No,touroku_date) ".
-						"VALUES( '".$lineResult['店名']."','".$lineResult['年式']."','".$lineResult['文言']."','".$lineResult['税抜']."','".$lineResult['税込']."','".$lineResult['index_No']."',DATE(now())	)\n";
-						//"VALUES( '".$lineResult['店名']."','".$lineResult['年式']."','".$lineResult['文言']."','".$lineResult['税抜']."','".$lineResult['税込']."','".$lineResult['index_No']."','".$lineResult['リンク']."',DATE(now())	)\n";
+						//"VALUES( '".$lineResult['店名']."','".$lineResult['年式']."','".$lineResult['文言']."','".$lineResult['税抜']."','".$lineResult['税込']."','".$lineResult['index_No']."',DATE(now())	)\n";
+						"VALUES( '".$lineResult['店名']."','".$lineResult['年式']."','".$lineResult['文言']."','".$lineResult['税抜']."','".$lineResult['税込']."','".$lineResult['index_No']."','".$lineResult['リンク']."',DATE(now())	)\n";
 				print $err;
 				$this->ScrapingErrMes.=$err;
 			}	
@@ -357,6 +364,7 @@ class ShopScraping{
 					$pageResult[$key]["index_No"]=$shashu["index_No"];
 					break 1;
 				}
+				//$pageResult[$key]["index_No"]="0";
 			}
 		}
 		//紐付けその１ここまで
@@ -371,6 +379,10 @@ class ShopScraping{
 		$this->arrayPut($pageResult,"kobetuMae",1);
 
 		//リンク先取得
+		if(	is_array($pageResult)	){
+			print "pageResult not array!!\n";
+			return false;
+		}
 		foreach($pageResult as $value){
 			if(	isset($value["リンク"])	){
 				$allColor=$this->linkSakiGet($value["リンク"]);
